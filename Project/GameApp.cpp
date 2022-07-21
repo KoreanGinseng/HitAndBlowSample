@@ -10,6 +10,14 @@
 //INCLUDE
 #include	"GameApp.h"
 
+// MANAGER
+#include    "Manager/ResourceManager.h"
+#include    "Manager/TextureManager.h"
+
+// TEST
+#include    "DrawNumbers/DrawNumbers.h"
+std::unique_ptr<CDrawNumbers> g_pDrawNums = nullptr;
+	
 /*************************************************************************//*!
 		@brief			アプリケーションの初期化
 		@param			None
@@ -18,6 +26,20 @@
 						それ以外	失敗、エラーコードが戻り値となる
 *//**************************************************************************/
 MofBool CGameApp::Initialize(void) {
+
+	// 画面サイズの変更
+	g_pGraphics->SetScreenSize(1280, 720);
+
+	// 素材フォルダに指定
+	CUtilities::SetCurrentDirectory("Resource");
+
+	// 画像の読み込み
+	if (!CResourceManager::GetTextureManager()->Load("Nums.png", "Nums.png")) {
+		return FALSE;
+	}
+
+	g_pDrawNums.reset(NEW CDrawNumbers());
+	g_pDrawNums->SetNum(1234567890);
 
 	return TRUE;
 }
@@ -47,6 +69,9 @@ MofBool CGameApp::Render(void) {
 	//画面のクリア
 	g_pGraphics->ClearTarget(0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0);
 
+	// テスト描画
+	g_pDrawNums->Render(0, 0, 0.5f, 0.5f);
+
 	//描画の終了
 	g_pGraphics->RenderEnd();
 	return TRUE;
@@ -59,6 +84,9 @@ MofBool CGameApp::Render(void) {
 						それ以外	失敗、エラーコードが戻り値となる
 *//**************************************************************************/
 MofBool CGameApp::Release(void) {
+
+	// 素材の解放
+	CResourceManager::Release();
 
 	return TRUE;
 }
