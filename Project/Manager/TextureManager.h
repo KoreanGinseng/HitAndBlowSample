@@ -19,9 +19,13 @@ public:
 
     bool Load(LPCMofChar pFile, std::string_view name);
 
-    const TexturePtr& const Get(std::string_view name) const;
+    void Erase(std::string_view name);
 
-    const TexturePtr const operator[](std::string name) const {
+    void Release();
+
+    const TexturePtr Get(std::string_view name) const;
+
+    const TexturePtr operator[](std::string name) const {
         return Get(name);
     }
 
