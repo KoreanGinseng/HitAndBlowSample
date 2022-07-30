@@ -162,6 +162,12 @@ MofBool CGameApp::Update(void) {
 
 	Vector2 mp;
 	g_pInput->GetMousePos(mp);
+	for (int i = 0; i < 3; i++) {
+		if (post_num_rects[i].CollisionPoint(mp) && g_pInput->IsMouseKeyPull(MOFMOUSE_LBUTTON)) {
+			post_select_cursor = i;
+			break;
+		}
+	}
 	for (int i = 0; i < 10; i++) {
 		if (::num_input_button_rects[i].CollisionPoint(mp) && g_pInput->IsMouseKeyPull(MOFMOUSE_LBUTTON)) {
 			for (int j = 0; j < 3; j++) {
