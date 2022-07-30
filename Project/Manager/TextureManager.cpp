@@ -1,5 +1,9 @@
 #include "TextureManager.h"
 
+namespace {
+    static TexturePtr Invalid = nullptr; //!< 無効値
+}
+
 CTextureManager::CTextureManager()
     : m_Map{}
 {
@@ -18,13 +22,14 @@ CTextureManager::~CTextureManager()
 bool CTextureManager::Load(LPCMofChar pFile, std::string_view name)
 {
     // 要素を作って読み込む
-    TexturePtr pTexture = std::make_shared<CTexture>();
-    if (!pTexture->Load(pFile)) {
+    TexturePtr pTexture = std::make_unique<CTexture>();
+    if (pTexture && !pTexture->Load(pFile)) {
         pTexture->Release();
+        assert(false);
         return false;
     }
     // 成功すればマップに登録する
-    m_Map.insert(std::make_pair(name, pTexture));
+    m_Map.insert(std::make_pair(name, std::move(pTexture)));
     return true;
 }
 
@@ -37,6 +42,7 @@ void CTextureManager::Erase(std::string_view name)
     // 検索して見つからなければなにもしない
     auto& it = m_Map.find(std::string(name));
     if (it == m_Map.end()) {
+        assert(false);
         return;
     }
     // 解放してマップから削除
@@ -62,12 +68,13 @@ void CTextureManager::Release()
 * @param[in] 登録名
 * @param return テクスチャポインタ, nullptr : 失敗
 */
-const TexturePtr CTextureManager::Get(std::string_view name) const
+RefTexturePtr CTextureManager::Get(std::string_view name)
 {
     // 検索して見つからなければ nullptr を返す
-    const auto& texture = m_Map.find(std::string(name));
+    auto& texture = m_Map.find(std::string(name));
     if (texture == m_Map.end()) {
-        return nullptr;
+        assert(false);
+        return Invalid;
     }
     return texture->second;
 }

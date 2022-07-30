@@ -109,6 +109,7 @@
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Common.h" />
     <ClInclude Include="DrawNumbers\DrawNumbers.h" />
     <ClInclude Include="GameApp.h" />
     <ClInclude Include="Manager\ResourceManager.h" />

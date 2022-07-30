@@ -1,11 +1,8 @@
 #pragma once
-#include <Mof.h>
+#include "../Common.h"
 #include <unordered_map>
 #include <string_view>
-#include <memory>
-
-// 名前の置き換え
-using TexturePtr = std::shared_ptr<CTexture>;
+#include <optional>
 
 // 画像管理クラス
 class CTextureManager
@@ -23,9 +20,9 @@ public:
 
     void Release();
 
-    const TexturePtr Get(std::string_view name) const;
+    RefTexturePtr Get(std::string_view name);
 
-    const TexturePtr operator[](std::string name) const {
+    RefTexturePtr operator[](std::string name) {
         return Get(name);
     }
 

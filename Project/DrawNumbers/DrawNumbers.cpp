@@ -34,10 +34,8 @@ namespace {
 }
 
 CDrawNumbers::CDrawNumbers()
-    : m_pTexture{ nullptr }
+    : m_pTexture{ CResourceManager::GetTextureManager()->Get("Nums.png") } // ‰æ‘œ‚ðÝ’è
 {
-    // ‰æ‘œ‚ðÝ’è
-    m_pTexture = CResourceManager::GetTextureManager()->Get("Nums.png");
 }
 
 CDrawNumbers::~CDrawNumbers()

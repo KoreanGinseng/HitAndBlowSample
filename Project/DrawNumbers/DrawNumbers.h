@@ -1,6 +1,5 @@
 #pragma once
-#include <Mof.h>
-#include <memory>
+#include "../Common.h"
 #include <string>
 
 // 数字描画クラス
@@ -18,7 +17,7 @@ public:
 
 private:
     
-    std::shared_ptr<CTexture>   m_pTexture;                //!< 画像ポインタ
-    std::string                 m_NumString;               //!< 数字文字列
+    RefTexturePtr   m_pTexture;                //!< 画像ポインタ
+    std::string     m_NumString;               //!< 数字文字列
 };
 

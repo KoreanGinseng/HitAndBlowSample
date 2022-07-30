@@ -71,11 +71,43 @@ namespace {
 	};
 
 	//TextureRect
+	const CRectangle board_src{ 384, 0, 480, 96 };
 	const CRectangle board_center_src{ 396, 12, 468, 84 };
 	const CRectangle board_top_src{ 384, 0, 480, 12 };
 	const CRectangle board_bottom_src{ 384, 84, 480, 96 };
 	const CRectangle board_left_src{ 384, 0, 396, 96 };
 	const CRectangle board_right_src{ 468, 0, 480, 96 };
+
+	const float input_button_w = push_num_button_area1.GetHeight() * (4.0f / 3.0f);
+	const float input_button_area_margin = push_num_button_area2.Top - push_num_button_area1.Bottom;
+	const float input_button_offsetx = (ingame_half_l_area.GetWidth() - input_button_area_margin * 4 - input_button_w * 5) * 0.5f;
+
+	const CRectangle num_input_button_rects[10] = {
+		{ push_num_button_area1.Left + (input_button_area_margin + input_button_w) * 0 + input_button_offsetx, push_num_button_area1.Top, push_num_button_area1.Left + input_button_w * 1 + input_button_area_margin * 0 + input_button_offsetx, push_num_button_area1.Bottom },
+		{ push_num_button_area1.Left + (input_button_area_margin + input_button_w) * 1 + input_button_offsetx, push_num_button_area1.Top, push_num_button_area1.Left + input_button_w * 2 + input_button_area_margin * 1 + input_button_offsetx, push_num_button_area1.Bottom },
+		{ push_num_button_area1.Left + (input_button_area_margin + input_button_w) * 2 + input_button_offsetx, push_num_button_area1.Top, push_num_button_area1.Left + input_button_w * 3 + input_button_area_margin * 2 + input_button_offsetx, push_num_button_area1.Bottom },
+		{ push_num_button_area1.Left + (input_button_area_margin + input_button_w) * 3 + input_button_offsetx, push_num_button_area1.Top, push_num_button_area1.Left + input_button_w * 4 + input_button_area_margin * 3 + input_button_offsetx, push_num_button_area1.Bottom },
+		{ push_num_button_area1.Left + (input_button_area_margin + input_button_w) * 4 + input_button_offsetx, push_num_button_area1.Top, push_num_button_area1.Left + input_button_w * 5 + input_button_area_margin * 4 + input_button_offsetx, push_num_button_area1.Bottom },
+		{ push_num_button_area2.Left + (input_button_area_margin + input_button_w) * 0 + input_button_offsetx, push_num_button_area2.Top, push_num_button_area2.Left + input_button_w * 1 + input_button_area_margin * 0 + input_button_offsetx, push_num_button_area2.Bottom },
+		{ push_num_button_area2.Left + (input_button_area_margin + input_button_w) * 1 + input_button_offsetx, push_num_button_area2.Top, push_num_button_area2.Left + input_button_w * 2 + input_button_area_margin * 1 + input_button_offsetx, push_num_button_area2.Bottom },
+		{ push_num_button_area2.Left + (input_button_area_margin + input_button_w) * 2 + input_button_offsetx, push_num_button_area2.Top, push_num_button_area2.Left + input_button_w * 3 + input_button_area_margin * 2 + input_button_offsetx, push_num_button_area2.Bottom },
+		{ push_num_button_area2.Left + (input_button_area_margin + input_button_w) * 3 + input_button_offsetx, push_num_button_area2.Top, push_num_button_area2.Left + input_button_w * 4 + input_button_area_margin * 3 + input_button_offsetx, push_num_button_area2.Bottom },
+		{ push_num_button_area2.Left + (input_button_area_margin + input_button_w) * 4 + input_button_offsetx, push_num_button_area2.Top, push_num_button_area2.Left + input_button_w * 5 + input_button_area_margin * 4 + input_button_offsetx, push_num_button_area2.Bottom }
+	};
+
+	const float post_num_size = post_num_area.GetHeight() * (16.0f / 9.0f);
+	const float post_num_area_margin = input_button_area_margin;
+	const float post_num_offsetx = (ingame_half_l_area.GetWidth() - post_num_area_margin * 2 - post_num_size * 3) * 0.5f;
+	const CRectangle post_num_rects[3] = {
+		{ post_num_offsetx + post_num_area.Left + (post_num_area_margin + post_num_size) * 0, post_num_area.Top, post_num_offsetx + post_num_area.Left +(post_num_area_margin + post_num_size) * 0 + post_num_size, post_num_area.Bottom },
+		{ post_num_offsetx + post_num_area.Left + (post_num_area_margin + post_num_size) * 1, post_num_area.Top, post_num_offsetx + post_num_area.Left +(post_num_area_margin + post_num_size) * 1 + post_num_size, post_num_area.Bottom },
+		{ post_num_offsetx + post_num_area.Left + (post_num_area_margin + post_num_size) * 2, post_num_area.Top, post_num_offsetx + post_num_area.Left +(post_num_area_margin + post_num_size) * 2 + post_num_size, post_num_area.Bottom },
+	};
+}
+
+namespace {
+	int post_numbers[3] = { -1, -1, -1 };
+	int post_select_cursor = 0;
 }
 
 // _DEBUG—p
@@ -98,10 +130,14 @@ MofBool CGameApp::Initialize(void) {
 	CUtilities::SetCurrentDirectory("Resource");
 
 	// ‰æ‘œ‚Ì“Ç‚Ýž‚Ý
-	if (!CResourceManager::GetTextureManager()->Load("Nums.png", "Nums.png")) {
-		return FALSE;
+	{
+		if (!CResourceManager::GetTextureManager()->Load("Nums.png", "Nums.png")) {
+			return FALSE;
+		}
+		if (!CResourceManager::GetTextureManager()->Load("Cryos_Mini_GUI/GUI/GUI_4x.png", "GUI_4x.png")) {
+			return FALSE;
+		}
 	}
-
 	g_pDrawNums.reset(NEW CDrawNumbers());
 	g_pDrawNums->SetNum(1234567890);
 
@@ -124,6 +160,22 @@ MofBool CGameApp::Update(void) {
 	}
 	#endif // _DEBUG
 
+	Vector2 mp;
+	g_pInput->GetMousePos(mp);
+	for (int i = 0; i < 10; i++) {
+		if (::num_input_button_rects[i].CollisionPoint(mp) && g_pInput->IsMouseKeyPull(MOFMOUSE_LBUTTON)) {
+			for (int j = 0; j < 3; j++) {
+				if (post_numbers[j] == i) {
+					post_numbers[j] = -1;
+					break;
+				}
+			}
+			post_numbers[post_select_cursor] = i;
+			post_select_cursor = (post_select_cursor + 1) % 3;
+			break;
+		}
+	}
+
 
 	return TRUE;
 }
@@ -144,27 +196,50 @@ MofBool CGameApp::Render(void) {
 	//g_pDrawNums->Render(0, 0, 0.5f, 0.5f);
 
 	#ifdef _DEBUG
-	if (g_IsDebug) {
-		// GRID
-		{
-			CGraphicsUtilities::RenderLine(0, screen_h * 0.5f, screen_w, screen_h * 0.5f, MOF_COLOR_YELLOW);
-			CGraphicsUtilities::RenderLine(screen_w * 0.5f, 0, screen_w * 0.5f, screen_h, MOF_COLOR_YELLOW);
-		}
-		// INGAME
-		{
-			CGraphicsUtilities::RenderFillRect(ingame_area, MOF_ARGB(128, 128, 0, 128));
-			CGraphicsUtilities::RenderFillRect(ingame_half_l_area, MOF_ALPHA_GREEN(128));
-			CGraphicsUtilities::RenderFillRect(score_board_l_area, MOF_ALPHA_GREEN(128));
-			CGraphicsUtilities::RenderFillRect(post_num_area, MOF_ALPHA_GREEN(128));
-			CGraphicsUtilities::RenderFillRect(push_num_button_area1, MOF_ALPHA_GREEN(128));
-			CGraphicsUtilities::RenderFillRect(push_num_button_area2, MOF_ALPHA_GREEN(128));
-			CGraphicsUtilities::RenderFillRect(edit_num_button_area, MOF_ALPHA_GREEN(128));
+	{
+		auto score_board_rect = score_board_l_area;
+		score_board_rect.Expansion(-score_board_l_area.GetWidth() * 0.05f, 0);
+		CGraphicsUtilities::RenderFillRect(score_board_rect, MOF_COLOR_HWHITE);
+		auto& tex = CResourceManager::GetTextureManager()->Get("GUI_4x.png");
+		tex->Render(score_board_rect, board_center_src);
+		if (g_IsDebug) {
+			// GRID
+			{
+				CGraphicsUtilities::RenderLine(0, screen_h * 0.5f, screen_w, screen_h * 0.5f, MOF_COLOR_YELLOW);
+				CGraphicsUtilities::RenderLine(screen_w * 0.5f, 0, screen_w * 0.5f, screen_h, MOF_COLOR_YELLOW);
+			}
+			// INGAME
+			{
+				CGraphicsUtilities::RenderFillRect(ingame_area, MOF_ARGB(128, 128, 0, 128));
+				CGraphicsUtilities::RenderFillRect(ingame_half_l_area, MOF_ALPHA_GREEN(128));
+				CGraphicsUtilities::RenderFillRect(score_board_l_area, MOF_ALPHA_GREEN(128));
+				CGraphicsUtilities::RenderFillRect(post_num_area, MOF_ALPHA_GREEN(128));
+				CGraphicsUtilities::RenderFillRect(push_num_button_area1, MOF_ALPHA_GREEN(128));
+				CGraphicsUtilities::RenderFillRect(push_num_button_area2, MOF_ALPHA_GREEN(128));
+				CGraphicsUtilities::RenderFillRect(edit_num_button_area, MOF_ALPHA_GREEN(128));
 
-			CGraphicsUtilities::RenderFillRect(ingame_half_r_area, MOF_ALPHA_RED(128));
-			CGraphicsUtilities::RenderFillRect(score_board_r_area, MOF_ALPHA_RED(128));
+				CGraphicsUtilities::RenderFillRect(ingame_half_r_area, MOF_ALPHA_RED(128));
+				CGraphicsUtilities::RenderFillRect(score_board_r_area, MOF_ALPHA_RED(128));
+			}
 		}
 	}
 	#endif // _DEBUG
+	
+	for (int i = 0; i < 10; i++) {
+		const auto& rect = num_input_button_rects[i];
+		CGraphicsUtilities::RenderFillRect(rect, MOF_COLOR_HWHITE);
+		CGraphicsUtilities::RenderString(rect.Left, rect.Top, "%d", i);
+	}
+	for (int i = 0; i < 3; i++) {
+		const auto& rect = post_num_rects[i];
+		CGraphicsUtilities::RenderFillRect(rect, MOF_COLOR_HWHITE);
+		if (post_numbers[i] >= 0) {
+			CGraphicsUtilities::RenderString(rect.Left, rect.Top, "%d", post_numbers[i]);
+		}
+		if (i == post_select_cursor) {
+			CGraphicsUtilities::RenderRect(rect, MOF_COLOR_RED);
+		}
+	}
 
 	//•`‰æ‚ÌI—¹
 	g_pGraphics->RenderEnd();
