@@ -127,7 +127,7 @@ namespace {
 	const float input_button_area_margin = push_num_button_area2.Top - push_num_button_area1.Bottom;
 	const float input_button_offsetx = (ingame_half_l_area.GetWidth() - input_button_area_margin * 4 - input_button_w * 5) * 0.5f;
 
-	const CRectangle num_input_button_rects[10] = {
+	const CRectangle num_input_button_rects[input_num_max] = {
 		{ push_num_button_area1.Left + (input_button_area_margin + input_button_w) * 0 + input_button_offsetx, push_num_button_area1.Top, push_num_button_area1.Left + input_button_w * 1 + input_button_area_margin * 0 + input_button_offsetx, push_num_button_area1.Bottom },
 		{ push_num_button_area1.Left + (input_button_area_margin + input_button_w) * 1 + input_button_offsetx, push_num_button_area1.Top, push_num_button_area1.Left + input_button_w * 2 + input_button_area_margin * 1 + input_button_offsetx, push_num_button_area1.Bottom },
 		{ push_num_button_area1.Left + (input_button_area_margin + input_button_w) * 2 + input_button_offsetx, push_num_button_area1.Top, push_num_button_area1.Left + input_button_w * 3 + input_button_area_margin * 2 + input_button_offsetx, push_num_button_area1.Bottom },
@@ -143,14 +143,14 @@ namespace {
 	const float post_num_size = post_num_area.GetHeight() * (16.0f / 9.0f);
 	const float post_num_area_margin = input_button_area_margin;
 	const float post_num_offsetx = (ingame_half_l_area.GetWidth() - post_num_area_margin * 2 - post_num_size * 3) * 0.5f;
-	const CRectangle post_num_rects[3] = {
+	const CRectangle post_num_rects[post_index_max] = {
 		{ post_num_offsetx + post_num_area.Left + (post_num_area_margin + post_num_size) * 0, post_num_area.Top, post_num_offsetx + post_num_area.Left +(post_num_area_margin + post_num_size) * 0 + post_num_size, post_num_area.Bottom },
 		{ post_num_offsetx + post_num_area.Left + (post_num_area_margin + post_num_size) * 1, post_num_area.Top, post_num_offsetx + post_num_area.Left +(post_num_area_margin + post_num_size) * 1 + post_num_size, post_num_area.Bottom },
 		{ post_num_offsetx + post_num_area.Left + (post_num_area_margin + post_num_size) * 2, post_num_area.Top, post_num_offsetx + post_num_area.Left +(post_num_area_margin + post_num_size) * 2 + post_num_size, post_num_area.Bottom },
 	};
 
 	const float edit_num_button_w = edit_num_button_area.GetWidth() / 3.0f;
-	const CRectangle edit_num_button_rects[3] = {
+	const CRectangle edit_num_button_rects[edit_button_max] = {
 		{ edit_num_button_area.Left + edit_num_button_w * 0, edit_num_button_area.Top, edit_num_button_area.Left + edit_num_button_w * 1, edit_num_button_area.Bottom },
 		{ edit_num_button_area.Left + edit_num_button_w * 1, edit_num_button_area.Top, edit_num_button_area.Left + edit_num_button_w * 2, edit_num_button_area.Bottom },
 		{ edit_num_button_area.Left + edit_num_button_w * 2, edit_num_button_area.Top, edit_num_button_area.Left + edit_num_button_w * 3, edit_num_button_area.Bottom }
