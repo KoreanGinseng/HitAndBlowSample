@@ -9,16 +9,61 @@
 
 //INCLUDE
 #include	"GameApp.h"
+#include    <array>
 
 // MANAGER
 #include    "Manager/ResourceManager.h"
 #include    "Manager/TextureManager.h"
 
-// TEST
-#include    "DrawNumbers/DrawNumbers.h"
-std::unique_ptr<CDrawNumbers> g_pDrawNums = nullptr;
-
 namespace {
+#define ENUM_TO_INT8(x) (static_cast<std::int8_t>(x))
+#define ENUM_TO_INT32(x) (static_cast<std::int32_t>(x))
+#define ENUM_TO_UINT8(x) (static_cast<std::uint8_t>(x))
+#define ENUM_TO_UINT32(x) (static_cast<std::uint32_t>(x))
+
+	enum class InGameStep {
+		Select,
+		Post,
+		Check,
+		Result,
+
+		MAX
+	};
+	constexpr std::int32_t ingame_step_max = ENUM_TO_INT32(InGameStep::MAX);
+
+	enum class InputNum {
+		Zero,
+		One,
+		Two,
+		Three,
+		Four,
+		Five,
+		Six,
+		Seven,
+		Eight,
+		Nine,
+
+		MAX
+	};
+	constexpr std::int32_t input_num_max = ENUM_TO_INT32(InputNum::MAX);
+
+	enum class PostIndex {
+		Zero,
+		One,
+		Two,
+
+		MAX
+	};
+	constexpr std::int32_t post_index_max = ENUM_TO_INT32(PostIndex::MAX);
+
+	enum class EditButton {
+		Clear,
+		Auto,
+		Post,
+
+		MAX
+	};
+	constexpr std::int32_t edit_button_max = ENUM_TO_INT32(EditButton::MAX);
 
 	// 画面サイズアクセサ
 	constexpr auto screen_w              = 1280.0f;
@@ -103,11 +148,57 @@ namespace {
 		{ post_num_offsetx + post_num_area.Left + (post_num_area_margin + post_num_size) * 1, post_num_area.Top, post_num_offsetx + post_num_area.Left +(post_num_area_margin + post_num_size) * 1 + post_num_size, post_num_area.Bottom },
 		{ post_num_offsetx + post_num_area.Left + (post_num_area_margin + post_num_size) * 2, post_num_area.Top, post_num_offsetx + post_num_area.Left +(post_num_area_margin + post_num_size) * 2 + post_num_size, post_num_area.Bottom },
 	};
+
+	const float edit_num_button_w = edit_num_button_area.GetWidth() / 3.0f;
+	const CRectangle edit_num_button_rects[3] = {
+		{ edit_num_button_area.Left + edit_num_button_w * 0, edit_num_button_area.Top, edit_num_button_area.Left + edit_num_button_w * 1, edit_num_button_area.Bottom },
+		{ edit_num_button_area.Left + edit_num_button_w * 1, edit_num_button_area.Top, edit_num_button_area.Left + edit_num_button_w * 2, edit_num_button_area.Bottom },
+		{ edit_num_button_area.Left + edit_num_button_w * 2, edit_num_button_area.Top, edit_num_button_area.Left + edit_num_button_w * 3, edit_num_button_area.Bottom }
+	};
+
 }
 
 namespace {
-	int post_numbers[3] = { -1, -1, -1 };
+	int post_numbers[post_index_max] = { -1, -1, -1 };
 	int post_select_cursor = 0;
+
+	InGameStep ingame_step = InGameStep::Select;
+	std::array < std::function<void(void)>, ingame_step_max > ingame_step_functions;
+}
+
+namespace {
+	void SelectStep() {
+		Vector2 mp;
+		g_pInput->GetMousePos(mp);
+		for (int i = 0; i < post_index_max; i++) {
+			if (post_num_rects[i].CollisionPoint(mp) && g_pInput->IsMouseKeyPull(MOFMOUSE_LBUTTON)) {
+				post_select_cursor = i;
+				break;
+			}
+		}
+		for (int i = 0; i < ingame_step_max; i++) {
+			if (::num_input_button_rects[i].CollisionPoint(mp) && g_pInput->IsMouseKeyPull(MOFMOUSE_LBUTTON)) {
+				for (int j = 0; j < post_index_max; j++) {
+					if (post_numbers[j] == i) {
+						post_numbers[j] = -1;
+						break;
+					}
+				}
+				post_numbers[post_select_cursor] = i;
+				post_select_cursor = (post_select_cursor + 1) % post_index_max;
+				break;
+			}
+		}
+	}
+	void PostStep() {
+
+	}
+	void CheckStep() {
+
+	}
+	void ResultStep() {
+
+	}
 }
 
 // _DEBUG用
@@ -138,8 +229,12 @@ MofBool CGameApp::Initialize(void) {
 			return FALSE;
 		}
 	}
-	g_pDrawNums.reset(NEW CDrawNumbers());
-	g_pDrawNums->SetNum(1234567890);
+
+	// ステップ関数の登録
+	ingame_step_functions[ENUM_TO_INT32(InGameStep::Select)] = SelectStep;
+	ingame_step_functions[ENUM_TO_INT32(InGameStep::Post)  ] = PostStep;
+	ingame_step_functions[ENUM_TO_INT32(InGameStep::Check) ] = CheckStep;
+	ingame_step_functions[ENUM_TO_INT32(InGameStep::Result)] = ResultStep;
 
 	return TRUE;
 }
@@ -160,28 +255,8 @@ MofBool CGameApp::Update(void) {
 	}
 	#endif // _DEBUG
 
-	Vector2 mp;
-	g_pInput->GetMousePos(mp);
-	for (int i = 0; i < 3; i++) {
-		if (post_num_rects[i].CollisionPoint(mp) && g_pInput->IsMouseKeyPull(MOFMOUSE_LBUTTON)) {
-			post_select_cursor = i;
-			break;
-		}
-	}
-	for (int i = 0; i < 10; i++) {
-		if (::num_input_button_rects[i].CollisionPoint(mp) && g_pInput->IsMouseKeyPull(MOFMOUSE_LBUTTON)) {
-			for (int j = 0; j < 3; j++) {
-				if (post_numbers[j] == i) {
-					post_numbers[j] = -1;
-					break;
-				}
-			}
-			post_numbers[post_select_cursor] = i;
-			post_select_cursor = (post_select_cursor + 1) % 3;
-			break;
-		}
-	}
-
+	// ステップに対応した関数を実行
+	ingame_step_functions[ENUM_TO_INT32(ingame_step)]();
 
 	return TRUE;
 }
@@ -197,9 +272,6 @@ MofBool CGameApp::Render(void) {
 	g_pGraphics->RenderStart();
 	//画面のクリア
 	g_pGraphics->ClearTarget(0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0);
-
-	// テスト描画
-	//g_pDrawNums->Render(0, 0, 0.5f, 0.5f);
 
 	#ifdef _DEBUG
 	{
@@ -231,12 +303,12 @@ MofBool CGameApp::Render(void) {
 	}
 	#endif // _DEBUG
 	
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < input_num_max; i++) {
 		const auto& rect = num_input_button_rects[i];
 		CGraphicsUtilities::RenderFillRect(rect, MOF_COLOR_HWHITE);
 		CGraphicsUtilities::RenderString(rect.Left, rect.Top, "%d", i);
 	}
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < post_index_max; i++) {
 		const auto& rect = post_num_rects[i];
 		CGraphicsUtilities::RenderFillRect(rect, MOF_COLOR_HWHITE);
 		if (post_numbers[i] >= 0) {
@@ -245,6 +317,11 @@ MofBool CGameApp::Render(void) {
 		if (i == post_select_cursor) {
 			CGraphicsUtilities::RenderRect(rect, MOF_COLOR_RED);
 		}
+	}
+	for (int i = 0; i < edit_button_max; i++) {
+		const auto& rect = edit_num_button_rects[i];
+		CGraphicsUtilities::RenderFillRect(rect, MOF_COLOR_HWHITE);
+		CGraphicsUtilities::RenderRect(rect, MOF_COLOR_BLACK);
 	}
 
 	//描画の終了
