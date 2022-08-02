@@ -27,6 +27,7 @@ namespace {
 		Post,
 		Check,
 		Result,
+		Win,
 
 		MAX
 	};
@@ -164,9 +165,9 @@ namespace {
 	};
 
 	struct ResultData {
-		int post_nums[post_index_max];
-		int hit;
-		int blow;
+		int post_nums[post_index_max]{ -1, -1, -1 };
+		int hit{ 0 };
+		int blow{ 0 };
 	};
 }
 
@@ -174,6 +175,7 @@ namespace {
 	std::bitset<ENUM_TO_UINT32(InputNum::MAX)> memo_num{ "1111111111" };
 	int enter_nums[post_index_max] = { -1, -1, -1 };
 	int post_numbers[post_index_max] = { -1, -1, -1 };
+	int answer_numbers[post_index_max] = { -1, -1, -1 };
 	int post_select_cursor = 0;
 
 	InGameStep ingame_step = InGameStep::Select;
@@ -181,12 +183,26 @@ namespace {
 	std::array<std::function<void(void)>, edit_button_max> edit_button_functions;
 	std::vector<ResultData> result_datas;
 }
+namespace {
+	void InGameInit() {
+		memo_num.set();
+		enter_nums[0] = enter_nums[1] = enter_nums[2] = -1;
+		post_numbers[0] = post_numbers[1] = post_numbers[2] = -1;
+		answer_numbers[0] = CUtilities::Random(0, 3);
+		answer_numbers[1] = CUtilities::Random(3, 6);
+		answer_numbers[2] = CUtilities::Random(6, 10);
+		post_select_cursor = 0;
+		ingame_step = InGameStep::Select;
+		result_datas.clear();
+	}
+}
 
 namespace {
 	void ClearButtonExec() {
 		for (auto& num : post_numbers) {
 			num = -1;
 		}
+		post_select_cursor = 0;
 	}
 
 	void AutoButtonExec() {
@@ -225,6 +241,7 @@ namespace {
 				return;
 			}
 		}
+		post_select_cursor = -1;
 		ingame_step = InGameStep::Post;
 	}
 }
@@ -240,8 +257,8 @@ namespace {
 					break;
 				}
 			}
-			for (int i = 0; i < ingame_step_max; i++) {
-				if (::num_input_button_rects[i].CollisionPoint(mp)) {
+			for (int i = 0; i < input_num_max; i++) {
+				if (num_input_button_rects[i].CollisionPoint(mp)) {
 					for (int j = 0; j < post_index_max; j++) {
 						if (post_numbers[j] == i) {
 							post_numbers[j] = -1;
@@ -262,13 +279,59 @@ namespace {
 		}
 	}
 	void PostStep() {
-
+		ResultData post;
+		for (int i = 0; i < post_index_max; i++) {
+			post.post_nums[i] = post_numbers[i];
+		}
+		result_datas.push_back(post);
+		ingame_step = InGameStep::Check;
 	}
 	void CheckStep() {
-
+		auto result = result_datas.rbegin();
+		for (int i = 0; i < post_index_max; i++) {
+			for (int j = 0; j < post_index_max; j++) {
+				if (i == j) {
+					if (result->post_nums[i] == answer_numbers[j]) { 
+						result->hit++;
+					}
+				}
+				else {
+					if (result->post_nums[i] == answer_numbers[j]) {
+						result->blow++;
+					}
+				}
+			}
+		}
+		ingame_step = InGameStep::Result;
 	}
 	void ResultStep() {
-
+		auto result = result_datas.rbegin();
+		if (result->hit == 3) {
+			ingame_step = InGameStep::Win;
+			return;
+		}
+		edit_button_functions[ENUM_TO_INT32(EditButton::Clear)]();
+		if (result->hit == 0 && result->blow == 0) {
+			for (const auto& num : result->post_nums) {
+				memo_num.reset(num);
+			}
+		}
+		if ((result->hit + result->blow) == 3) {
+			for (int i = 0; i < input_num_max; i++) {
+				if (i != result->post_nums[0]
+					&& i != result->post_nums[1]
+					&& i != result->post_nums[2]) {
+					memo_num.reset(i);
+				}
+			}
+		}
+		ingame_step = InGameStep::Select;
+	}
+	void WinStep() {
+		if (g_pInput->IsKeyPull(MOFKEY_RETURN)) {
+			InGameInit();
+			ingame_step = InGameStep::Select;
+		}
 	}
 }
 
@@ -301,11 +364,15 @@ MofBool CGameApp::Initialize(void) {
 		}
 	}
 
+	// ゲームの初期化
+	InGameInit();
+
 	// ステップ関数の登録
 	ingame_step_functions[ENUM_TO_INT32(InGameStep::Select)] = SelectStep;
 	ingame_step_functions[ENUM_TO_INT32(InGameStep::Post)  ] = PostStep;
 	ingame_step_functions[ENUM_TO_INT32(InGameStep::Check) ] = CheckStep;
 	ingame_step_functions[ENUM_TO_INT32(InGameStep::Result)] = ResultStep;
+	ingame_step_functions[ENUM_TO_INT32(InGameStep::Win)   ] = WinStep;
 
 	// ボタン関数の登録
 	edit_button_functions[ENUM_TO_INT32(EditButton::Clear)] = ClearButtonExec;
@@ -349,13 +416,14 @@ MofBool CGameApp::Render(void) {
 	//画面のクリア
 	g_pGraphics->ClearTarget(0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0);
 
+	auto score_board_rect = score_board_l_area;
+	score_board_rect.Expansion(-score_board_l_area.GetWidth() * 0.05f, 0);
+	CGraphicsUtilities::RenderFillRect(score_board_rect, MOF_COLOR_HWHITE);
+	auto& tex = CResourceManager::GetTextureManager()->Get("GUI_4x.png");
+	tex->Render(score_board_rect, board_center_src);
+
 	#ifdef _DEBUG
 	{
-		auto score_board_rect = score_board_l_area;
-		score_board_rect.Expansion(-score_board_l_area.GetWidth() * 0.05f, 0);
-		CGraphicsUtilities::RenderFillRect(score_board_rect, MOF_COLOR_HWHITE);
-		auto& tex = CResourceManager::GetTextureManager()->Get("GUI_4x.png");
-		tex->Render(score_board_rect, board_center_src);
 		if (g_IsDebug) {
 			// GRID
 			{
@@ -405,6 +473,21 @@ MofBool CGameApp::Render(void) {
 			edit_button_strs[i]
 		);
 		CGraphicsUtilities::RenderRect(rect, MOF_COLOR_BLACK);
+	}
+	const auto& result_num_count = result_datas.size();
+	for (int i = 0; i < result_num_count; i++) {
+		const auto& result = result_datas[i];
+		CGraphicsUtilities::RenderString(
+			score_board_rect.Left,
+			score_board_rect.Top + 30 * i, MOF_COLOR_BLACK,
+			"%4d | %d %d %d | %d | %d",
+			i, result.post_nums[0], result.post_nums[1], result.post_nums[2],
+			result.hit, result.blow
+		);
+	}
+
+	if (ingame_step == InGameStep::Win) {
+		CGraphicsUtilities::RenderString(0, 0, "あなたの勝ち！！\nエンターキーでもう一度");
 	}
 
 	//描画の終了
