@@ -10,6 +10,7 @@
 //INCLUDE
 #include	"GameApp.h"
 #include    <array>
+#include    <bitset>
 
 // MANAGER
 #include    "Manager/ResourceManager.h"
@@ -64,6 +65,12 @@ namespace {
 		MAX
 	};
 	constexpr std::int32_t edit_button_max = ENUM_TO_INT32(EditButton::MAX);
+
+	constexpr const char* edit_button_strs[edit_button_max] = {
+		"クリア",
+		"自動",
+		"決定",
+	};
 
 	// 画面サイズアクセサ
 	constexpr auto screen_w              = 1280.0f;
@@ -156,37 +163,101 @@ namespace {
 		{ edit_num_button_area.Left + edit_num_button_w * 2, edit_num_button_area.Top, edit_num_button_area.Left + edit_num_button_w * 3, edit_num_button_area.Bottom }
 	};
 
+	struct ResultData {
+		int post_nums[post_index_max];
+		int hit;
+		int blow;
+	};
 }
 
 namespace {
+	std::bitset<ENUM_TO_UINT32(InputNum::MAX)> memo_num{ "1111111111" };
+	int enter_nums[post_index_max] = { -1, -1, -1 };
 	int post_numbers[post_index_max] = { -1, -1, -1 };
 	int post_select_cursor = 0;
 
 	InGameStep ingame_step = InGameStep::Select;
-	std::array < std::function<void(void)>, ingame_step_max > ingame_step_functions;
+	std::array<std::function<void(void)>, ingame_step_max> ingame_step_functions;
+	std::array<std::function<void(void)>, edit_button_max> edit_button_functions;
+	std::vector<ResultData> result_datas;
+}
+
+namespace {
+	void ClearButtonExec() {
+		for (auto& num : post_numbers) {
+			num = -1;
+		}
+	}
+
+	void AutoButtonExec() {
+		std::vector<int> empty_index = { 0, 1, 2 };
+		for (int i = 0; i < post_index_max; i++) {
+			if (enter_nums[i] < 0) {
+				continue;
+			}
+			post_numbers[i] = enter_nums[i];
+			std::remove_if(empty_index.begin(), empty_index.end(), [&](int n) { return i == n; });
+		}
+		if (empty_index.size() == 0) {
+			return;
+		}
+		std::vector<int> nums;
+		nums.reserve(input_num_max);
+		auto uinput_num_max = memo_num.size();
+		for (std::size_t i = 0; i < uinput_num_max; i++) {
+			if (!memo_num.test(i)) {
+				continue;
+			}
+			nums.emplace_back(i);
+		}
+		while (empty_index.size()) {
+			auto post_index = CUtilities::Random(empty_index.size());
+			auto num_index  = CUtilities::Random(nums.size());
+			post_numbers[empty_index[post_index]] = nums[num_index];
+			empty_index.erase(empty_index.begin() + post_index);
+			nums.erase(nums.begin() + num_index);
+		}
+	}
+
+	void PostButtonExec() {
+		for (int i = 0; i < post_index_max; i++) {
+			if (post_numbers[i] < 0) {
+				return;
+			}
+		}
+		ingame_step = InGameStep::Post;
+	}
 }
 
 namespace {
 	void SelectStep() {
 		Vector2 mp;
 		g_pInput->GetMousePos(mp);
-		for (int i = 0; i < post_index_max; i++) {
-			if (post_num_rects[i].CollisionPoint(mp) && g_pInput->IsMouseKeyPull(MOFMOUSE_LBUTTON)) {
-				post_select_cursor = i;
-				break;
-			}
-		}
-		for (int i = 0; i < ingame_step_max; i++) {
-			if (::num_input_button_rects[i].CollisionPoint(mp) && g_pInput->IsMouseKeyPull(MOFMOUSE_LBUTTON)) {
-				for (int j = 0; j < post_index_max; j++) {
-					if (post_numbers[j] == i) {
-						post_numbers[j] = -1;
-						break;
-					}
+		if (g_pInput->IsMouseKeyPull(MOFMOUSE_LBUTTON)) {
+			for (int i = 0; i < post_index_max; i++) {
+				if (post_num_rects[i].CollisionPoint(mp)) {
+					post_select_cursor = i;
+					break;
 				}
-				post_numbers[post_select_cursor] = i;
-				post_select_cursor = (post_select_cursor + 1) % post_index_max;
-				break;
+			}
+			for (int i = 0; i < ingame_step_max; i++) {
+				if (::num_input_button_rects[i].CollisionPoint(mp)) {
+					for (int j = 0; j < post_index_max; j++) {
+						if (post_numbers[j] == i) {
+							post_numbers[j] = -1;
+							break;
+						}
+					}
+					post_numbers[post_select_cursor] = i;
+					post_select_cursor = (post_select_cursor + 1) % post_index_max;
+					break;
+				}
+			}
+			for (int i = 0; i < edit_button_max; i++) {
+				if (edit_num_button_rects[i].CollisionPoint(mp)) {
+					edit_button_functions[i]();
+					break;
+				}
 			}
 		}
 	}
@@ -235,6 +306,11 @@ MofBool CGameApp::Initialize(void) {
 	ingame_step_functions[ENUM_TO_INT32(InGameStep::Post)  ] = PostStep;
 	ingame_step_functions[ENUM_TO_INT32(InGameStep::Check) ] = CheckStep;
 	ingame_step_functions[ENUM_TO_INT32(InGameStep::Result)] = ResultStep;
+
+	// ボタン関数の登録
+	edit_button_functions[ENUM_TO_INT32(EditButton::Clear)] = ClearButtonExec;
+	edit_button_functions[ENUM_TO_INT32(EditButton::Auto) ] = AutoButtonExec;
+	edit_button_functions[ENUM_TO_INT32(EditButton::Post) ] = PostButtonExec;
 
 	return TRUE;
 }
@@ -321,6 +397,13 @@ MofBool CGameApp::Render(void) {
 	for (int i = 0; i < edit_button_max; i++) {
 		const auto& rect = edit_num_button_rects[i];
 		CGraphicsUtilities::RenderFillRect(rect, MOF_COLOR_HWHITE);
+		CRectangle str_rect;
+		CGraphicsUtilities::CalculateStringRect(0, 0, edit_button_strs[i], str_rect);
+		CGraphicsUtilities::RenderString(
+			rect.Left + (rect.GetWidth()  - str_rect.GetWidth() ) * 0.5f,
+			rect.Top  + (rect.GetHeight() - str_rect.GetHeight()) * 0.5f,
+			edit_button_strs[i]
+		);
 		CGraphicsUtilities::RenderRect(rect, MOF_COLOR_BLACK);
 	}
 
