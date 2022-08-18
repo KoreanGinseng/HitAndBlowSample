@@ -177,6 +177,7 @@ namespace {
 	int post_numbers[post_index_max] = { -1, -1, -1 };
 	int answer_numbers[post_index_max] = { -1, -1, -1 };
 	int post_select_cursor = 0;
+	float draw_score_board_offset = 0.0f;
 
 	InGameStep ingame_step = InGameStep::Select;
 	std::array<std::function<void(void)>, ingame_step_max> ingame_step_functions;
@@ -284,6 +285,12 @@ namespace {
 			post.post_nums[i] = post_numbers[i];
 		}
 		result_datas.push_back(post);
+
+		const auto& result_num_count   = result_datas.size();
+		const float draw_result_bottom = score_board_l_area.Top + 30 * result_num_count;
+		if (score_board_l_area.Bottom <= draw_result_bottom) {
+			draw_score_board_offset    = draw_result_bottom - score_board_l_area.Bottom;
+		}
 		ingame_step = InGameStep::Check;
 	}
 	void CheckStep() {
@@ -401,6 +408,19 @@ MofBool CGameApp::Update(void) {
 	// ステップに対応した関数を実行
 	ingame_step_functions[ENUM_TO_INT32(ingame_step)]();
 
+	// スコアボード範囲内スクロール
+	Vector2 mousePos; g_pInput->GetMousePos(mousePos);
+	const float wheel = g_pInput->GetMouseWheelMove();
+	if (score_board_l_area.CollisionPoint(mousePos) && wheel != 0.0f)
+	{
+		const auto& result_num_count = result_datas.size();
+		const float draw_result_max  = 30 * result_num_count;
+		if (score_board_l_area.GetHeight() <= draw_result_max) {
+			draw_score_board_offset -= wheel * 0.125f;
+			draw_score_board_offset  = MOF_CLIPING(draw_score_board_offset, 0.0f, draw_result_max - score_board_l_area.GetHeight());
+		}
+	}
+
 	return TRUE;
 }
 /*************************************************************************//*!
@@ -416,11 +436,28 @@ MofBool CGameApp::Render(void) {
 	//画面のクリア
 	g_pGraphics->ClearTarget(0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0);
 
+	g_pGraphics->SetStencilEnable(TRUE);
+	g_pGraphics->SetStencilValue(1);
+	g_pGraphics->SetStencilControl(COMPARISON_ALWAYS, STENCIL_REPLACE, STENCIL_REPLACE, STENCIL_REPLACE);
 	auto score_board_rect = score_board_l_area;
 	score_board_rect.Expansion(-score_board_l_area.GetWidth() * 0.05f, 0);
 	CGraphicsUtilities::RenderFillRect(score_board_rect, MOF_COLOR_HWHITE);
 	auto& tex = CResourceManager::GetTextureManager()->Get("GUI_4x.png");
 	tex->Render(score_board_rect, board_center_src);
+
+	g_pGraphics->SetStencilControl(COMPARISON_EQUAL, STENCIL_KEEP, STENCIL_KEEP, STENCIL_KEEP);
+	const auto& result_num_count = result_datas.size();
+	for (int i = 0; i < result_num_count; i++) {
+		const auto& result = result_datas[i];
+		CGraphicsUtilities::RenderString(
+			score_board_rect.Left,
+			score_board_rect.Top + 30 * i - draw_score_board_offset, MOF_COLOR_BLACK,
+			"%4d | %d %d %d | %d | %d",
+			i, result.post_nums[0], result.post_nums[1], result.post_nums[2],
+			result.hit, result.blow
+		);
+	}
+	g_pGraphics->SetStencilEnable(FALSE);
 
 	#ifdef _DEBUG
 	{
@@ -473,17 +510,6 @@ MofBool CGameApp::Render(void) {
 			edit_button_strs[i]
 		);
 		CGraphicsUtilities::RenderRect(rect, MOF_COLOR_BLACK);
-	}
-	const auto& result_num_count = result_datas.size();
-	for (int i = 0; i < result_num_count; i++) {
-		const auto& result = result_datas[i];
-		CGraphicsUtilities::RenderString(
-			score_board_rect.Left,
-			score_board_rect.Top + 30 * i, MOF_COLOR_BLACK,
-			"%4d | %d %d %d | %d | %d",
-			i, result.post_nums[0], result.post_nums[1], result.post_nums[2],
-			result.hit, result.blow
-		);
 	}
 
 	if (ingame_step == InGameStep::Win) {

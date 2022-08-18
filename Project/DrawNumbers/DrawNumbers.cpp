@@ -16,16 +16,16 @@ namespace {
     static const MofS32 width_max    = 800;
     static const MofS32 height_max   = 410;
     static const Mof::Rectangle rects[NUM_COUNT] = {
-        { width * NUM_1,                   0, width * NUM_1 + width,     height },
-        { width * NUM_2,                   0, width * NUM_2 + width,     height },
-        { width * NUM_3,                   0, width * NUM_3 + width,     height },
-        { width * NUM_4,                   0, width * NUM_4 + width,     height },
-        { width * NUM_5,                   0, width * NUM_5 + width,     height },
-        { width * NUM_1, height_max - height, width * NUM_1 + width, height_max },
-        { width * NUM_2, height_max - height, width * NUM_2 + width, height_max },
-        { width * NUM_3, height_max - height, width * NUM_3 + width, height_max },
-        { width * NUM_4, height_max - height, width * NUM_4 + width, height_max },
-        { width * NUM_5, height_max - height, width * NUM_5 + width, height_max },
+        Mof::Rectangle( width * NUM_1,                   0, width * NUM_1 + width,     height ),
+        Mof::Rectangle( width * NUM_2,                   0, width * NUM_2 + width,     height ),
+        Mof::Rectangle( width * NUM_3,                   0, width * NUM_3 + width,     height ),
+        Mof::Rectangle( width * NUM_4,                   0, width * NUM_4 + width,     height ),
+        Mof::Rectangle( width * NUM_5,                   0, width * NUM_5 + width,     height ),
+        Mof::Rectangle( width * NUM_1, height_max - height, width * NUM_1 + width, height_max ),
+        Mof::Rectangle( width * NUM_2, height_max - height, width * NUM_2 + width, height_max ),
+        Mof::Rectangle( width * NUM_3, height_max - height, width * NUM_3 + width, height_max ),
+        Mof::Rectangle( width * NUM_4, height_max - height, width * NUM_4 + width, height_max ),
+        Mof::Rectangle( width * NUM_5, height_max - height, width * NUM_5 + width, height_max ),
     };
     static const MofS32 draw_offsets_x[NUM_COUNT] = {
         10, 5, 0, -5, -10,
