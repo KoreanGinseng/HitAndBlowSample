@@ -1,16 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 16
-VisualStudioVersion = 16
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.2017
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ProjectVS2019", "Project\ProjectVS2019.vcxproj", "{582B9C61-742D-4D2B-9C72-42C088CE473D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		2017_d|Win32 = 2017_d|Win32
 		Debug|Win32 = Debug|Win32
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{582B9C61-742D-4D2B-9C72-42C088CE473D}.2017_d|Win32.ActiveCfg = 2017_d|Win32
+		{582B9C61-742D-4D2B-9C72-42C088CE473D}.2017_d|Win32.Build.0 = 2017_d|Win32
 		{582B9C61-742D-4D2B-9C72-42C088CE473D}.Debug|Win32.ActiveCfg = Debug|Win32
 		{582B9C61-742D-4D2B-9C72-42C088CE473D}.Debug|Win32.Build.0 = Debug|Win32
 		{582B9C61-742D-4D2B-9C72-42C088CE473D}.Release|Win32.ActiveCfg = Release|Win32
@@ -18,5 +21,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {11A9F4FC-053D-4A39-9009-FE9E6565EAAC}
 	EndGlobalSection
 EndGlobal
