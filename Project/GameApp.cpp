@@ -85,6 +85,8 @@ namespace {
 
 	constexpr auto ingame_w = screen_w - screen_margin * 2.0f;
 	constexpr auto ingame_h = screen_h - screen_margin * 2.0f;
+
+	constexpr auto draw_line_margin = 30.0f;
 	
 	const CRectangle ingame_area{ 
 		screen_margin, screen_margin,
@@ -414,7 +416,7 @@ MofBool CGameApp::Update(void) {
 	if (score_board_l_area.CollisionPoint(mousePos) && wheel != 0.0f)
 	{
 		const auto& result_num_count = result_datas.size();
-		const float draw_result_max  = 30 * result_num_count;
+		const float draw_result_max  = draw_line_margin * result_num_count;
 		if (score_board_l_area.GetHeight() <= draw_result_max) {
 			draw_score_board_offset -= wheel * 0.125f;
 			draw_score_board_offset  = MOF_CLIPING(draw_score_board_offset, 0.0f, draw_result_max - score_board_l_area.GetHeight());
@@ -451,7 +453,7 @@ MofBool CGameApp::Render(void) {
 		const auto& result = result_datas[i];
 		CGraphicsUtilities::RenderString(
 			score_board_rect.Left,
-			score_board_rect.Top + 30 * i - draw_score_board_offset, MOF_COLOR_BLACK,
+			score_board_rect.Top + draw_line_margin * i - draw_score_board_offset, MOF_COLOR_BLACK,
 			"%4d | %d %d %d | %d | %d",
 			i, result.post_nums[0], result.post_nums[1], result.post_nums[2],
 			result.hit, result.blow
