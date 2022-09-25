@@ -13,17 +13,20 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="ソース ファイル\DrawNumbers">
-      <UniqueIdentifier>{e97d47a7-9758-4dfa-81fe-a4e1521e5000}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\DrawNumbers">
-      <UniqueIdentifier>{1a1dacb4-42f0-490c-b690-55d5a4ec89f8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ヘッダー ファイル\Manager">
       <UniqueIdentifier>{77e8532b-4494-44d2-a63d-5cf85ff4d8bf}</UniqueIdentifier>
     </Filter>
     <Filter Include="ソース ファイル\Manager">
       <UniqueIdentifier>{6d5be4a4-a8ed-4360-b429-cd3d062ea55c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\SceneManager">
+      <UniqueIdentifier>{6957a831-c7e5-4ec0-96a3-a67b950e4bc2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\SceneChangeEffect">
+      <UniqueIdentifier>{31cd4ff8-ebd4-4900-b7bb-a5bec3f93532}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\SceneChangeEffect">
+      <UniqueIdentifier>{e64be45e-c530-40e4-b0fa-d10c1aa81a24}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -33,14 +36,17 @@
     <ClCompile Include="GameApp.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="DrawNumbers\DrawNumbers.cpp">
-      <Filter>ソース ファイル\DrawNumbers</Filter>
-    </ClCompile>
     <ClCompile Include="Manager\TextureManager.cpp">
       <Filter>ソース ファイル\Manager</Filter>
     </ClCompile>
     <ClCompile Include="Manager\ResourceManager.cpp">
       <Filter>ソース ファイル\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneChangeEffect\SceneChangeEffectFade.cpp">
+      <Filter>ソース ファイル\SceneChangeEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneChangeEffect\FadeShader.cpp">
+      <Filter>ソース ファイル\SceneChangeEffect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -50,9 +56,6 @@
     <ClInclude Include="resource.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="DrawNumbers\DrawNumbers.h">
-      <Filter>ヘッダー ファイル\DrawNumbers</Filter>
-    </ClInclude>
     <ClInclude Include="Manager\TextureManager.h">
       <Filter>ヘッダー ファイル\Manager</Filter>
     </ClInclude>
@@ -61,6 +64,30 @@
     </ClInclude>
     <ClInclude Include="Common.h">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager\IScene.h">
+      <Filter>ヘッダー ファイル\SceneManager</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager\ISceneChangeEffect.h">
+      <Filter>ヘッダー ファイル\SceneManager</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager\ISceneChanger.h">
+      <Filter>ヘッダー ファイル\SceneManager</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager\ISceneCreator.h">
+      <Filter>ヘッダー ファイル\SceneManager</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager\ISceneRegister.h">
+      <Filter>ヘッダー ファイル\SceneManager</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager\SceneManager.h">
+      <Filter>ヘッダー ファイル\SceneManager</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneChangeEffect\SceneChangeEffectFade.h">
+      <Filter>ヘッダー ファイル\SceneChangeEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneChangeEffect\FadeShader.h">
+      <Filter>ヘッダー ファイル\SceneChangeEffect</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
