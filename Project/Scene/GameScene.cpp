@@ -81,9 +81,6 @@ namespace {
 		"決定",
 	};
 
-	// 画面サイズアクセサ
-	constexpr auto screen_w = 1280.0f;
-	constexpr auto screen_h = 720.0f;
 	constexpr auto screen_margin = screen_h * 0.05f;
 
 	constexpr auto top_margin_h_ratio = 0.0500f;
@@ -348,7 +345,7 @@ namespace {
 			//InGameInit();
 			Scene::g_pSceneChanger->change(
 				SceneName::Title,
-				std::make_unique<sip::SceneChangeEffectFade>(&Scene::g_FadeShader)
+				std::make_unique<sip::SceneChangeEffectFade>(&Scene::g_FadeShader, 1.0f)
 			);
 		}
 	}
