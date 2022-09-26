@@ -213,7 +213,7 @@ namespace sip
         SceneChangeEffectPtr                     m_pChangeEffect; //!< 画面変更効果
         std::unordered_map<int, SceneCreatorPtr> m_SceneMap;      //!< シーン生成マップ
     };
-
+    using SceneManagerPtr = std::shared_ptr<SceneManager>;
 }
 
 

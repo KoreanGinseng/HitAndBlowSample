@@ -28,6 +28,12 @@
     <Filter Include="ソース ファイル\SceneChangeEffect">
       <UniqueIdentifier>{e64be45e-c530-40e4-b0fa-d10c1aa81a24}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Scene">
+      <UniqueIdentifier>{deb327ee-7def-480b-bf0c-cc77dcb5131a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Scene">
+      <UniqueIdentifier>{3d860f61-a734-4d29-8caa-930e2f08ad5a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
@@ -47,6 +53,9 @@
     </ClCompile>
     <ClCompile Include="SceneChangeEffect\FadeShader.cpp">
       <Filter>ソース ファイル\SceneChangeEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\GameScene.cpp">
+      <Filter>ソース ファイル\Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -88,6 +97,12 @@
     </ClInclude>
     <ClInclude Include="SceneChangeEffect\FadeShader.h">
       <Filter>ヘッダー ファイル\SceneChangeEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\GameScene.h">
+      <Filter>ヘッダー ファイル\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\SceneDefine.h">
+      <Filter>ヘッダー ファイル\Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

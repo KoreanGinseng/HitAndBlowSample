@@ -2,6 +2,8 @@
 #include "SceneChangeEffectFade.h"
 #include <assert.h>
 #include <algorithm>
+#include "../Manager/ResourceManager.h"
+#include "../Manager/TextureManager.h"
 
 /**
 * @brief コンストラクタ
@@ -20,6 +22,7 @@ sip::SceneChangeEffectFade::SceneChangeEffectFade(RuleFade::CFadeShader* pShader
     }
     m_pTarget = std::make_unique<CTexture>();
     m_pTarget->Create(g_pGraphics->GetTargetWidth(), g_pGraphics->GetTargetHeight(), PIXELFORMAT_R8G8B8A8_UNORM, BUFFERACCESS_GPUREADWRITE);
+    m_pRuleFade->SetMaskTexture(CResourceManager::GetTextureManager()->Get("FadeOut").get());
 }
 
 /**
@@ -27,6 +30,7 @@ sip::SceneChangeEffectFade::SceneChangeEffectFade(RuleFade::CFadeShader* pShader
 */
 sip::SceneChangeEffectFade::~SceneChangeEffectFade()
 {
+    m_pRuleFade->SetMaskTexture(nullptr);
     m_pTarget->Release();
     m_pTarget.reset();
 }
@@ -40,7 +44,11 @@ void sip::SceneChangeEffectFade::update()
     {
         // フェード値更新
         m_Timer += CUtilities::GetFrameSecond() / m_FadeTime;
-        m_isFadeIn = true;
+        if (m_Timer >= 1.0f)
+        {
+            m_isFadeIn = true;
+            m_pRuleFade->SetMaskTexture(CResourceManager::GetTextureManager()->Get("FadeIn").get());
+        }
     }
     else
     {
