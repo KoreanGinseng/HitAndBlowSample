@@ -488,14 +488,17 @@ void GameScene::draw()
 	}
 
 	if (ingame_step == InGameStep::Win) {
+		Vector2 mp;
+		g_pInput->GetMousePos(mp);
+		bool is_mouse_over = return_button_rect.CollisionPoint(mp);
 		Mof::Rectangle calc_rect;
 		CGraphicsUtilities::CalculateStringRect(0, 0, "タイトルへ", calc_rect);
 		CGraphicsUtilities::RenderFillRect(0, 0, screen_w, screen_h, MOF_ALPHA_HWHITE(128));
 		CGraphicsUtilities::RenderString(screen_w * 0.45f, screen_h * 0.3f, "%d手で勝利！", result_datas.size());
-		MofU32 top_color    = MOF_COLOR_CWHITE;
-		MofU32 bottom_color = MOF_COLOR_CBLACK;
+		MofU32 top_color    = is_mouse_over ? MOF_COLOR_CBLACK : MOF_COLOR_CWHITE;
+		MofU32 bottom_color = is_mouse_over ? MOF_COLOR_CWHITE : MOF_COLOR_CBLACK;
 		CGraphicsUtilities::RenderFillRect(return_button_rect, top_color, bottom_color, top_color, bottom_color);
-		CGraphicsUtilities::RenderRect(return_button_rect, MOF_COLOR_HWHITE);
+		CGraphicsUtilities::RenderRect(return_button_rect, (is_mouse_over ? MOF_COLOR_HBLUE : MOF_COLOR_HWHITE));
 		CGraphicsUtilities::RenderString(
 			(screen_w - calc_rect.Right ) * 0.5f,
 			(screen_h - calc_rect.Bottom) * 0.5f,

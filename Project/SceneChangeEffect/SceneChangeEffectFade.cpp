@@ -91,7 +91,6 @@ void sip::SceneChangeEffectFade::draw(ScenePtr prev, ScenePtr current)
         // コンスタントバッファの設定
         m_pRuleFade->SetBuffer();
         CGraphicsUtilities::RenderTexture(0, 0, m_pTarget.get(), m_pRuleFade->GetShader(), m_pRuleFade->GetShaderBind());
-        CGraphicsUtilities::RenderString(0, 0, "%f", m_Timer);
     }
 }
 
