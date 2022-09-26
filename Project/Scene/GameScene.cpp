@@ -427,12 +427,13 @@ void GameScene::draw()
 		CGraphicsUtilities::RenderString(
 			score_board_rect.Left,
 			score_board_rect.Top + draw_line_margin * i - draw_score_board_offset, MOF_COLOR_BLACK,
-			"%4d | %d %d %d | %d | %d",
+			"| %4d | %d %d %d |  %d  |  %d  |",
 			i + 1, result.post_nums[0], result.post_nums[1], result.post_nums[2],
 			result.hit, result.blow
 		);
 	}
 	g_pGraphics->SetStencilEnable(FALSE);
+	CGraphicsUtilities::RenderString(score_board_rect.Left, score_board_rect.Top - 30, MOF_COLOR_WHITE, "| ‰ñ” | ‰ñ“š  | Hit | Blow|");
 
 #ifdef _DEBUG
 	{
