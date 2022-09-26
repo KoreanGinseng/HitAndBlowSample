@@ -14,14 +14,16 @@ sip::SceneChangeEffectFade::SceneChangeEffectFade(RuleFade::CFadeShader* pShader
     , m_isFadeIn{ false }
     , m_FadeTime{ fadeTime }
     , m_pTarget{ nullptr }
+    , m_Timer{ 0.0f }
 {
+    m_pRuleFade->SetSoftRange(softRange);
     // 0以下にならないようにする
     if (m_FadeTime <= 0.0f)
     {
         m_FadeTime = 0.01f;
     }
     m_pTarget = std::make_unique<CTexture>();
-    m_pTarget->Create(g_pGraphics->GetTargetWidth(), g_pGraphics->GetTargetHeight(), PIXELFORMAT_R8G8B8A8_UNORM, BUFFERACCESS_GPUREADWRITE);
+    m_pTarget->CreateTarget(g_pGraphics->GetTargetWidth(), g_pGraphics->GetTargetHeight(), PIXELFORMAT_R8G8B8A8_UNORM, BUFFERACCESS_GPUREADWRITE);
     m_pRuleFade->SetMaskTexture(CResourceManager::GetTextureManager()->Get("FadeOut").get());
 }
 
@@ -85,9 +87,11 @@ void sip::SceneChangeEffectFade::draw(ScenePtr prev, ScenePtr current)
     {
         g_pGraphics->SetRenderTarget(target_tmp, depth_target);
         g_pGraphics->ClearTarget(0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0);
+        CGraphicsUtilities::RenderFillRect(0, 0, 1280, 720, MOF_COLOR_BLACK);
         // コンスタントバッファの設定
         m_pRuleFade->SetBuffer();
         CGraphicsUtilities::RenderTexture(0, 0, m_pTarget.get(), m_pRuleFade->GetShader(), m_pRuleFade->GetShaderBind());
+        CGraphicsUtilities::RenderString(0, 0, "%f", m_Timer);
     }
 }
 

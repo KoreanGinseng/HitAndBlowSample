@@ -12,6 +12,18 @@
 #include    "../SceneChangeEffect/SceneChangeEffectFade.h"
 #include    "SceneDefine.h"
 
+// _DEBUG用
+#ifdef _DEBUG
+namespace debug {
+	extern bool g_IsDebug;
+}
+#endif//_DEBUG
+
+namespace Scene {
+	extern sip::SceneChangerPtr g_pSceneChanger;
+	extern RuleFade::CFadeShader g_FadeShader;
+}
+
 namespace {
 #define ENUM_TO_INT8(x) (static_cast<std::int8_t>(x))
 #define ENUM_TO_INT32(x) (static_cast<std::int32_t>(x))
@@ -333,22 +345,13 @@ namespace {
 	}
 	void WinStep() {
 		if (g_pInput->IsKeyPull(MOFKEY_RETURN)) {
-			InGameInit();
-			ingame_step = InGameStep::Select;
+			//InGameInit();
+			Scene::g_pSceneChanger->change(
+				SceneName::Title,
+				std::make_unique<sip::SceneChangeEffectFade>(&Scene::g_FadeShader)
+			);
 		}
 	}
-}
-
-// _DEBUG用
-#ifdef _DEBUG
-namespace debug {
-	extern bool g_IsDebug;
-}
-#endif//_DEBUG
-
-namespace Scene {
-	extern sip::SceneChangerPtr g_pSceneChanger;
-	extern RuleFade::CFadeShader g_FadeShader;
 }
 
 GameScene::GameScene()
@@ -379,7 +382,10 @@ void GameScene::init()
 
 void GameScene::update()
 {
-
+	if (Scene::g_pSceneChanger->isChange())
+	{
+		return;
+	}
 	// ステップに対応した関数を実行
 	ingame_step_functions[ENUM_TO_INT32(ingame_step)]();
 

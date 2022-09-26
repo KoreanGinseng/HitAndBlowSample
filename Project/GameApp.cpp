@@ -17,6 +17,7 @@
 // SCENE
 #include    "Scene/SceneDefine.h"
 #include    "Scene/GameScene.h"
+#include    "Scene/TitleScene.h"
 #include    "SceneChangeEffect/FadeShader.h"
 #include    "SceneChangeEffect/SceneChangeEffectFade.h"
 
@@ -61,13 +62,17 @@ MofBool CGameApp::Initialize(void) {
 			return FALSE;
 		}
 	}
-	Scene::g_FadeShader.Create();
+	if (!Scene::g_FadeShader.Create())
+	{
+		return FALSE;
+	}
 	
 	Scene::g_pSceneManager = std::make_shared<sip::SceneManager>();
+	Scene::g_pSceneManager->regist<TitleScene>(SceneName::Title);
 	Scene::g_pSceneManager->regist<GameScene>(SceneName::Game);
 
 	Scene::g_pSceneChanger = Scene::g_pSceneManager;
-	Scene::g_pSceneChanger->change(SceneName::Game);
+	Scene::g_pSceneChanger->change(SceneName::Title);
 	
 	return TRUE;
 }

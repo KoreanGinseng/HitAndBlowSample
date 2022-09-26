@@ -149,6 +149,7 @@
     <ClCompile Include="SceneChangeEffect\FadeShader.cpp" />
     <ClCompile Include="SceneChangeEffect\SceneChangeEffectFade.cpp" />
     <ClCompile Include="Scene\GameScene.cpp" />
+    <ClCompile Include="Scene\TitleScene.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -167,6 +168,7 @@
     <ClInclude Include="SceneManager\SceneManager.h" />
     <ClInclude Include="Scene\GameScene.h" />
     <ClInclude Include="Scene\SceneDefine.h" />
+    <ClInclude Include="Scene\TitleScene.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Version.rc" />
