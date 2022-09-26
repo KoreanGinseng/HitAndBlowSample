@@ -170,6 +170,14 @@ namespace {
 		{ edit_num_button_area.Left + edit_num_button_w * 1, edit_num_button_area.Top, edit_num_button_area.Left + edit_num_button_w * 2, edit_num_button_area.Bottom },
 		{ edit_num_button_area.Left + edit_num_button_w * 2, edit_num_button_area.Top, edit_num_button_area.Left + edit_num_button_w * 3, edit_num_button_area.Bottom }
 	};
+	const float return_button_w = 200.0f;
+	const float return_button_h =  50.0f;
+	const CRectangle return_button_rect{
+		(screen_w - return_button_w) * 0.5f,
+		(screen_h - return_button_h) * 0.5f,
+		(screen_w + return_button_w) * 0.5f,
+		(screen_h + return_button_h) * 0.5f
+	};
 
 	struct ResultData {
 		int post_nums[post_index_max]{ -1, -1, -1 };
@@ -341,8 +349,9 @@ namespace {
 		ingame_step = InGameStep::Select;
 	}
 	void WinStep() {
-		if (g_pInput->IsKeyPull(MOFKEY_RETURN)) {
-			//InGameInit();
+		Vector2 mp;
+		g_pInput->GetMousePos(mp);
+		if (return_button_rect.CollisionPoint(mp) && g_pInput->IsMouseKeyPull(MOFMOUSE_LBUTTON)) {
 			Scene::g_pSceneChanger->change(
 				SceneName::Title,
 				std::make_unique<sip::SceneChangeEffectFade>(&Scene::g_FadeShader, 1.0f)
@@ -419,7 +428,7 @@ void GameScene::draw()
 			score_board_rect.Left,
 			score_board_rect.Top + draw_line_margin * i - draw_score_board_offset, MOF_COLOR_BLACK,
 			"%4d | %d %d %d | %d | %d",
-			i, result.post_nums[0], result.post_nums[1], result.post_nums[2],
+			i + 1, result.post_nums[0], result.post_nums[1], result.post_nums[2],
 			result.hit, result.blow
 		);
 	}
@@ -479,7 +488,20 @@ void GameScene::draw()
 	}
 
 	if (ingame_step == InGameStep::Win) {
-		CGraphicsUtilities::RenderString(0, 0, "あなたの勝ち！！\nエンターキーでもう一度");
+		Mof::Rectangle calc_rect;
+		CGraphicsUtilities::CalculateStringRect(0, 0, "タイトルへ", calc_rect);
+		CGraphicsUtilities::RenderFillRect(0, 0, screen_w, screen_h, MOF_ALPHA_HWHITE(128));
+		CGraphicsUtilities::RenderString(screen_w * 0.45f, screen_h * 0.3f, "%d手で勝利！", result_datas.size());
+		MofU32 top_color    = MOF_COLOR_CWHITE;
+		MofU32 bottom_color = MOF_COLOR_CBLACK;
+		CGraphicsUtilities::RenderFillRect(return_button_rect, top_color, bottom_color, top_color, bottom_color);
+		CGraphicsUtilities::RenderRect(return_button_rect, MOF_COLOR_HWHITE);
+		CGraphicsUtilities::RenderString(
+			(screen_w - calc_rect.Right ) * 0.5f,
+			(screen_h - calc_rect.Bottom) * 0.5f,
+			MOF_COLOR_BLACK,
+			"タイトルへ"
+		);
 	}
 }
 
