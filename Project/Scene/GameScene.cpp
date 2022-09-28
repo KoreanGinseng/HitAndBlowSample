@@ -361,6 +361,7 @@ namespace {
 }
 
 GameScene::GameScene()
+	: m_BG_View()
 {
 }
 
@@ -384,14 +385,18 @@ void GameScene::init()
 	edit_button_functions[ENUM_TO_INT32(EditButton::Clear)] = ClearButtonExec;
 	edit_button_functions[ENUM_TO_INT32(EditButton::Auto)] = AutoButtonExec;
 	edit_button_functions[ENUM_TO_INT32(EditButton::Post)] = PostButtonExec;
+
+	m_BG_View.setBGTexture("BG_Game");
 }
 
 void GameScene::update()
 {
+	m_BG_View.update();
 	if (Scene::g_pSceneChanger->isChange())
 	{
 		return;
 	}
+
 	// ステップに対応した関数を実行
 	ingame_step_functions[ENUM_TO_INT32(ingame_step)]();
 
@@ -411,6 +416,7 @@ void GameScene::update()
 
 void GameScene::draw()
 {
+	m_BG_View.draw();
 	g_pGraphics->SetStencilEnable(TRUE);
 	g_pGraphics->SetStencilValue(1);
 	g_pGraphics->SetStencilControl(COMPARISON_ALWAYS, STENCIL_REPLACE, STENCIL_REPLACE, STENCIL_REPLACE);

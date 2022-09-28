@@ -61,6 +61,15 @@ MofBool CGameApp::Initialize(void) {
 		if (!CResourceManager::GetTextureManager()->Load("Rule1080p/171.png", "FadeIn")) {
 			return FALSE;
 		}
+		if (!CResourceManager::GetTextureManager()->Load("Yellow.png", "BG_Title")) {
+			return FALSE;
+		}
+		if (!CResourceManager::GetTextureManager()->Load("Gray.png", "BG_Game")) {
+			return FALSE;
+		}
+		if (!CResourceManager::GetTextureManager()->Load("Title.png", "Title_Logo")) {
+			return FALSE;
+		}
 	}
 	if (!Scene::g_FadeShader.Create())
 	{

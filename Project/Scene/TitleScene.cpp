@@ -43,6 +43,7 @@ namespace {
 }
 
 TitleScene::TitleScene() 
+	: m_BG_View()
 {
 }
 
@@ -52,10 +53,12 @@ TitleScene::~TitleScene()
 
 void TitleScene::init() 
 {
+	m_BG_View.setBGTexture("BG_Title");
 }
 
 void TitleScene::update() 
 {
+	m_BG_View.update();
 	if (Scene::g_pSceneChanger->isChange())
 	{
 		return;
@@ -77,6 +80,12 @@ void TitleScene::update()
 
 void TitleScene::draw() 
 {
+	m_BG_View.draw();
+	auto pLogo = CResourceManager::GetTextureManager()->Get("Title_Logo").get();
+	if (pLogo)
+	{
+		pLogo->Render(screen_w * 0.5f, pLogo->GetHeight() * 1.5f, TEXALIGN_CENTERCENTER);
+	}
 	Vector2 mp;
 	g_pInput->GetMousePos(mp);
 	MofU32 play_top_color    = MOF_COLOR_CWHITE;
