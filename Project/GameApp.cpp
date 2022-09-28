@@ -49,9 +49,6 @@ MofBool CGameApp::Initialize(void) {
 
 	// ‰æ‘œ‚Ì“Ç‚Ýž‚Ý
 	{
-		if (!CResourceManager::GetTextureManager()->Load("Nums.png", "Nums.png")) {
-			return FALSE;
-		}
 		if (!CResourceManager::GetTextureManager()->Load("Cryos_Mini_GUI/GUI/GUI_4x.png", "GUI_4x.png")) {
 			return FALSE;
 		}
